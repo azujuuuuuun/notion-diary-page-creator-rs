@@ -74,7 +74,7 @@ impl Client {
         id: &str,
         params: &QueryDatabaseParams,
     ) -> Result<QueryDatabaseResponse, Box<dyn Error>> {
-        let url = "https://api.notion.com/v1/databases/".to_owned() + &id + "/query";
+        let url = "https://api.notion.com/v1/databases/".to_owned() + id + "/query";
 
         let headers = self.create_headers();
 
