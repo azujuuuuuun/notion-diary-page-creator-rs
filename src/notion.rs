@@ -1,4 +1,4 @@
-use std::error::Error;
+use std::{collections::HashMap, error::Error};
 
 use reqwest::header::{HeaderMap, ACCEPT, AUTHORIZATION, CONTENT_TYPE};
 use serde::{Deserialize, Serialize};
@@ -31,46 +31,37 @@ pub struct QueryDatabaseResponse {
     pub results: Vec<QueryDatabaseResult>,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Debug)]
 pub struct CreatePageParent {
     pub database_id: String,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Debug)]
 pub struct CreatePageTitleText {
     pub content: String,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Debug)]
 pub struct CreatePageTitle {
     pub text: CreatePageTitleText,
 }
 
-#[derive(Serialize)]
-pub struct CreatePageNameProperty {
-    pub title: Vec<CreatePageTitle>,
-}
-
-#[derive(Serialize)]
+#[derive(Serialize, Debug)]
 pub struct CreatePageDate {
     pub start: String,
 }
 
-#[derive(Serialize)]
-pub struct CreatePageDateProperty {
-    pub date: CreatePageDate,
+#[derive(Serialize, Debug)]
+#[serde(untagged)]
+pub enum CreatePageProperty {
+    Title { title: Vec<CreatePageTitle> },
+    Date { date: CreatePageDate },
 }
 
-#[derive(Serialize)]
-pub struct CreatePageProperties {
-    pub Name: CreatePageNameProperty,
-    pub Date: CreatePageDateProperty,
-}
-
-#[derive(Serialize)]
+#[derive(Serialize, Debug)]
 pub struct CreatePageParams {
     pub parent: CreatePageParent,
-    pub properties: CreatePageProperties,
+    pub properties: HashMap<String, CreatePageProperty>,
 }
 
 impl Client {

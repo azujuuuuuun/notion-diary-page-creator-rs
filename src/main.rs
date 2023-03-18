@@ -1,14 +1,13 @@
 mod env;
 mod notion;
 
-use std::{error::Error, process::exit};
+use std::{collections::HashMap, error::Error, process::exit};
 
 use chrono::{Datelike, Local, Weekday};
 
 use crate::notion::{
-    CreatePageDate, CreatePageDateProperty, CreatePageNameProperty, CreatePageParams,
-    CreatePageParent, CreatePageProperties, CreatePageTitle, CreatePageTitleText,
-    QueryDatabaseDateFilter, QueryDatabaseFilter, QueryDatabaseParams,
+    CreatePageDate, CreatePageParams, CreatePageParent, CreatePageProperty, CreatePageTitle,
+    CreatePageTitleText, QueryDatabaseDateFilter, QueryDatabaseFilter, QueryDatabaseParams,
 };
 
 #[tokio::main]
@@ -48,23 +47,27 @@ async fn main() -> Result<(), Box<dyn Error>> {
         Weekday::Sat => "土",
     };
     let title = local.format("%Y/%m/%d").to_string() + "(" + ja_weekday + ")";
-    let params = CreatePageParams {
-        parent: CreatePageParent {
-            database_id: env.database_id.to_string(),
-        },
-        properties: CreatePageProperties {
-            Name: CreatePageNameProperty {
-                title: vec![CreatePageTitle {
-                    text: CreatePageTitleText { content: title },
-                }],
-            },
-            Date: CreatePageDateProperty {
-                date: CreatePageDate {
-                    start: local.format("%Y-%m-%d").to_string(),
-                },
-            },
-        },
+    let parent = CreatePageParent {
+        database_id: env.database_id.to_string(),
     };
+    let mut properties: HashMap<String, CreatePageProperty> = HashMap::new();
+    properties.insert(
+        "Name".to_string(),
+        CreatePageProperty::Title {
+            title: vec![CreatePageTitle {
+                text: CreatePageTitleText { content: title },
+            }],
+        },
+    );
+    properties.insert(
+        "Date".to_string(),
+        CreatePageProperty::Date {
+            date: CreatePageDate {
+                start: local.format("%Y-%m-%d").to_string(),
+            },
+        },
+    );
+    let params = CreatePageParams { parent, properties };
 
     notion_client.create_page(&params).await?;
     println!("Today's diary page was created successfully.");
