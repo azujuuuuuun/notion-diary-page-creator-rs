@@ -1,12 +1,26 @@
 use std::error::Error;
 
-use chrono::{Datelike, Local, Weekday};
 use reqwest::header::{HeaderMap, ACCEPT, AUTHORIZATION, CONTENT_TYPE};
-use serde::Deserialize;
-use serde_json::json;
+use serde::{Deserialize, Serialize};
 
 pub struct Client {
     api_token: String,
+}
+
+#[derive(Serialize)]
+pub struct QueryDatabaseDateFilter {
+    pub equals: String,
+}
+
+#[derive(Serialize)]
+pub struct QueryDatabaseFilter {
+    pub property: String,
+    pub date: QueryDatabaseDateFilter,
+}
+
+#[derive(Serialize)]
+pub struct QueryDatabaseParams {
+    pub filter: QueryDatabaseFilter,
 }
 
 #[derive(Deserialize, Debug)]
@@ -17,31 +31,67 @@ pub struct QueryDatabaseResponse {
     pub results: Vec<QueryDatabaseResult>,
 }
 
+#[derive(Serialize)]
+pub struct CreatePageParent {
+    pub database_id: String,
+}
+
+#[derive(Serialize)]
+pub struct CreatePageTitleText {
+    pub content: String,
+}
+
+#[derive(Serialize)]
+pub struct CreatePageTitle {
+    pub text: CreatePageTitleText,
+}
+
+#[derive(Serialize)]
+pub struct CreatePageNameProperty {
+    pub title: Vec<CreatePageTitle>,
+}
+
+#[derive(Serialize)]
+pub struct CreatePageDate {
+    pub start: String,
+}
+
+#[derive(Serialize)]
+pub struct CreatePageDateProperty {
+    pub date: CreatePageDate,
+}
+
+#[derive(Serialize)]
+pub struct CreatePageProperties {
+    pub Name: CreatePageNameProperty,
+    pub Date: CreatePageDateProperty,
+}
+
+#[derive(Serialize)]
+pub struct CreatePageParams {
+    pub parent: CreatePageParent,
+    pub properties: CreatePageProperties,
+}
+
 impl Client {
     pub fn new(api_token: String) -> Client {
         Client { api_token }
     }
 
-    pub async fn query_database(&self, id: &str) -> Result<QueryDatabaseResponse, Box<dyn Error>> {
+    pub async fn query_database(
+        &self,
+        id: &str,
+        params: &QueryDatabaseParams,
+    ) -> Result<QueryDatabaseResponse, Box<dyn Error>> {
         let url = "https://api.notion.com/v1/databases/".to_owned() + &id + "/query";
 
         let headers = self.create_headers();
-
-        let local = Local::now();
-        let params = json!({
-            "filter": {
-                "property": "Date",
-                "date": {
-                    "equals": local.format("%Y-%m-%d").to_string()
-                }
-            }
-        });
 
         let client = reqwest::Client::new();
         let resp = client
             .post(url)
             .headers(headers)
-            .json(&params)
+            .json(params)
             .send()
             .await?
             .json::<QueryDatabaseResponse>()
@@ -50,47 +100,16 @@ impl Client {
         Ok(resp)
     }
 
-    pub async fn create_page(&self, id: &str) -> Result<(), Box<dyn Error>> {
+    pub async fn create_page(&self, params: &CreatePageParams) -> Result<(), Box<dyn Error>> {
         let url = "https://api.notion.com/v1/pages";
 
         let headers = self.create_headers();
-
-        let local = Local::now();
-        let ja_weekday = match local.weekday() {
-            Weekday::Sun => "日",
-            Weekday::Mon => "月",
-            Weekday::Tue => "火",
-            Weekday::Wed => "水",
-            Weekday::Thu => "木",
-            Weekday::Fri => "金",
-            Weekday::Sat => "土",
-        };
-        let title = local.format("%Y/%m/%d").to_string() + "(" + ja_weekday + ")";
-        let params = json!({
-            "parent": {
-                "database_id": id,
-            },
-            "properties": {
-                "Name": {
-                    "title": [{
-                        "text": {
-                            "content": title
-                        }
-                    }]
-                },
-                "Date": {
-                    "date": {
-                        "start": local.format("%Y-%m-%d").to_string()
-                    }
-                }
-            }
-        });
 
         let client = reqwest::Client::new();
         client
             .post(url)
             .headers(headers)
-            .json(&params)
+            .json(params)
             .send()
             .await?;
 
