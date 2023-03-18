@@ -25,14 +25,7 @@ impl Client {
     pub async fn query_database(&self, id: &str) -> Result<QueryDatabaseResponse, Box<dyn Error>> {
         let url = "https://api.notion.com/v1/databases/".to_owned() + &id + "/query";
 
-        let mut headers = HeaderMap::new();
-        headers.insert(ACCEPT, "application/json".parse().unwrap());
-        headers.insert("Notion-Version", "2022-06-28".parse().unwrap());
-        headers.insert(CONTENT_TYPE, "application/json".parse().unwrap());
-        headers.insert(
-            AUTHORIZATION,
-            ("Bearer ".to_owned() + &self.api_token).parse().unwrap(),
-        );
+        let headers = self.create_headers();
 
         let local = Local::now();
         let params = json!({
@@ -60,14 +53,7 @@ impl Client {
     pub async fn create_page(&self, id: &str) -> Result<(), Box<dyn Error>> {
         let url = "https://api.notion.com/v1/pages";
 
-        let mut headers = HeaderMap::new();
-        headers.insert(ACCEPT, "application/json".parse().unwrap());
-        headers.insert("Notion-Version", "2022-06-28".parse().unwrap());
-        headers.insert(CONTENT_TYPE, "application/json".parse().unwrap());
-        headers.insert(
-            AUTHORIZATION,
-            ("Bearer ".to_owned() + &self.api_token).parse().unwrap(),
-        );
+        let headers = self.create_headers();
 
         let local = Local::now();
         let ja_weekday = match local.weekday() {
@@ -109,5 +95,17 @@ impl Client {
             .await?;
 
         Ok(())
+    }
+
+    fn create_headers(&self) -> HeaderMap {
+        let mut headers = HeaderMap::new();
+        headers.insert(ACCEPT, "application/json".parse().unwrap());
+        headers.insert("Notion-Version", "2022-06-28".parse().unwrap());
+        headers.insert(CONTENT_TYPE, "application/json".parse().unwrap());
+        headers.insert(
+            AUTHORIZATION,
+            ("Bearer ".to_owned() + &self.api_token).parse().unwrap(),
+        );
+        return headers;
     }
 }
