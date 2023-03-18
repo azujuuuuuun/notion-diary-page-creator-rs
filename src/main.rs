@@ -1,7 +1,8 @@
-use std::{env, error::Error, process::exit};
+mod env;
+
+use std::{error::Error, process::exit};
 
 use chrono::{Datelike, Local, Weekday};
-use dotenv::dotenv;
 use reqwest::header::{HeaderMap, ACCEPT, AUTHORIZATION, CONTENT_TYPE};
 use serde::Deserialize;
 use serde_json::json;
@@ -16,15 +17,11 @@ struct QueryDatabaseResponse {
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
-    dotenv().ok();
-
-    let database_id =
-        env::var("NOTION_DIARY_DATABASE_ID").expect("NOTION_DIARY_DATABASE_ID is not set.");
-    let api_token = env::var("NOTION_API_TOKEN").expect("NOTION_API_TOKEN is not set.");
+    let env = env::load_env();
 
     println!("Creating diary page started.");
 
-    let url = "https://api.notion.com/v1/databases/".to_owned() + &database_id + "/query";
+    let url = "https://api.notion.com/v1/databases/".to_owned() + &env.database_id + "/query";
 
     let mut headers = HeaderMap::new();
     headers.insert(ACCEPT, "application/json".parse().unwrap());
@@ -32,7 +29,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     headers.insert(CONTENT_TYPE, "application/json".parse().unwrap());
     headers.insert(
         AUTHORIZATION,
-        ("Bearer ".to_owned() + &api_token).parse().unwrap(),
+        ("Bearer ".to_owned() + &env.api_token).parse().unwrap(),
     );
 
     let local = Local::now();
@@ -68,7 +65,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     headers.insert(CONTENT_TYPE, "application/json".parse().unwrap());
     headers.insert(
         AUTHORIZATION,
-        ("Bearer ".to_owned() + &api_token).parse().unwrap(),
+        ("Bearer ".to_owned() + &env.api_token).parse().unwrap(),
     );
 
     let local = Local::now();
@@ -84,7 +81,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let title = local.format("%Y/%m/%d").to_string() + "(" + ja_weekday + ")";
     let params = json!({
         "parent": {
-            "database_id": database_id,
+            "database_id": env.database_id,
         },
         "properties": {
             "Name": {
