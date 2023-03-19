@@ -45,3 +45,34 @@ impl NotionParamsFactory {
         CreatePageParams { parent, properties }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_build_query_database_params() {
+        let today = Date::new(2023, 03, 19, 0, 0, 0);
+
+        let params = NotionParamsFactory::build_query_database_params(&today);
+
+        assert_eq!(params.filter.property, "Date");
+        assert_eq!(params.filter.date.equals, "2023-03-19");
+    }
+
+    #[test]
+    fn test_build_create_page_params() {
+        let database_id = "database_id";
+        let today = Date::new(2023, 03, 19, 0, 0, 0);
+
+        let params = NotionParamsFactory::build_create_page_params(database_id, &today);
+
+        assert_eq!(params.parent.database_id, database_id);
+        if let CreatePageProperty::Title { title } = params.properties.get("Name").unwrap() {
+            assert_eq!(title.get(0).unwrap().text.content, "2023/03/19(日)")
+        }
+        if let CreatePageProperty::Date { date } = params.properties.get("Date").unwrap() {
+            assert_eq!(date.start, "2023-03-19")
+        }
+    }
+}
