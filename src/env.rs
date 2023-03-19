@@ -11,8 +11,8 @@ pub fn load_env() -> Env {
     dotenv().ok();
 
     let database_id =
-        env::var("NOTION_DIARY_DATABASE_ID").expect("NOTION_DIARY_DATABASE_ID is not set.");
-    let api_token = env::var("NOTION_API_TOKEN").expect("NOTION_API_TOKEN is not set.");
+        env::var("NOTION_DIARY_DATABASE_ID").expect("NOTION_DIARY_DATABASE_ID must be set.");
+    let api_token = env::var("NOTION_API_TOKEN").expect("NOTION_API_TOKEN must be set.");
 
     Env {
         database_id,
