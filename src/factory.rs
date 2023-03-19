@@ -9,19 +9,18 @@ use crate::notion::{
 pub struct NotionParamsFactory;
 
 impl NotionParamsFactory {
-    pub fn build_query_database_params() -> QueryDatabaseParams {
+    pub fn build_query_database_params(today: &Date) -> QueryDatabaseParams {
         QueryDatabaseParams {
             filter: QueryDatabaseFilter {
                 property: "Date".to_string(),
                 date: QueryDatabaseDateFilter {
-                    equals: Date::today().format(),
+                    equals: today.format(),
                 },
             },
         }
     }
 
-    pub fn build_create_page_params(database_id: &str) -> CreatePageParams {
-        let today = Date::today();
+    pub fn build_create_page_params(database_id: &str, today: &Date) -> CreatePageParams {
         let title = today.format_with_slash() + "(" + &today.ja_weekday() + ")";
         let parent = CreatePageParent {
             database_id: database_id.to_string(),
