@@ -146,4 +146,17 @@ mod tests {
 
         assert_eq!(result.results.len(), 0);
     }
+
+    #[tokio::test]
+    async fn test_create_headers() {
+        let mock = MockHttpClientTrait::new();
+        let notion_api_client = NotionApiClient::new(mock, "api_token".to_string());
+
+        let headers = notion_api_client.create_headers();
+
+        assert_eq!(headers.get(ACCEPT).unwrap(), "application/json");
+        assert_eq!(headers.get("Notion-Version").unwrap(), "2022-06-28");
+        assert_eq!(headers.get(CONTENT_TYPE).unwrap(), "application/json");
+        assert_eq!(headers.get(AUTHORIZATION).unwrap(), "Bearer api_token");
+    }
 }
