@@ -3,7 +3,7 @@ use std::{collections::HashMap, error::Error};
 use reqwest::header::{HeaderMap, ACCEPT, AUTHORIZATION, CONTENT_TYPE};
 use serde::{Deserialize, Serialize};
 
-pub struct Client {
+pub struct NotionApiClient {
     api_token: String,
 }
 
@@ -64,9 +64,9 @@ pub struct CreatePageParams {
     pub properties: HashMap<String, CreatePageProperty>,
 }
 
-impl Client {
-    pub fn new(api_token: String) -> Client {
-        Client { api_token }
+impl NotionApiClient {
+    pub fn new(api_token: String) -> NotionApiClient {
+        NotionApiClient { api_token }
     }
 
     pub async fn query_database(
