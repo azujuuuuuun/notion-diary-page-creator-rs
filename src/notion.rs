@@ -65,7 +65,7 @@ pub struct CreatePageParams {
 }
 
 impl NotionApiClient {
-    pub fn new(api_token: String) -> NotionApiClient {
+    pub fn new(api_token: String) -> Self {
         NotionApiClient { api_token }
     }
 
