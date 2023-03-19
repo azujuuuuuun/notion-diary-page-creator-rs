@@ -6,7 +6,7 @@ pub struct Date {
 
 impl Date {
     #[cfg(test)]
-    fn new(year: i32, month: u32, day: u32, hour: u32, min: u32, sec: u32) -> Date {
+    fn new(year: i32, month: u32, day: u32, hour: u32, min: u32, sec: u32) -> Self {
         use chrono::TimeZone;
 
         Date {
@@ -16,7 +16,7 @@ impl Date {
         }
     }
 
-    pub fn today() -> Date {
+    pub fn today() -> Self {
         Date {
             date_time: Local::now(),
         }
