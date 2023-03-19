@@ -119,6 +119,8 @@ impl<C: HttpClientTrait> NotionApiClient<C> {
 
 #[cfg(test)]
 mod tests {
+    use mockall::*;
+
     use crate::http_client::MockHttpClientTrait;
 
     use super::*;
@@ -136,8 +138,11 @@ mod tests {
             },
         };
 
+        let url = "https://api.notion.com/v1/databases/id/query";
+
         let mut mock = MockHttpClientTrait::new();
         mock.expect_post::<QueryDatabaseParams, QueryDatabaseResponse>()
+            .with(predicate::eq(url), predicate::always(), predicate::always())
             .times(1)
             .returning(|_, _, _| Ok(QueryDatabaseResponse { results: vec![] }));
         let notion_api_client = NotionApiClient::new(mock, api_token.to_string());
