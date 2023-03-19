@@ -1,14 +1,10 @@
 mod env;
+mod factory;
 mod notion;
 
-use std::{collections::HashMap, error::Error, process::exit};
+use std::{error::Error, process::exit};
 
-use chrono::{Datelike, Local, Weekday};
-
-use crate::notion::{
-    CreatePageDate, CreatePageParams, CreatePageParent, CreatePageProperty, CreatePageTitle,
-    CreatePageTitleText, QueryDatabaseDateFilter, QueryDatabaseFilter, QueryDatabaseParams,
-};
+use crate::factory::NotionParamsFactory;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
@@ -18,15 +14,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     let notion_client = notion::Client::new(env.api_token);
 
-    let local = Local::now();
-    let params = QueryDatabaseParams {
-        filter: QueryDatabaseFilter {
-            property: "Date".to_string(),
-            date: QueryDatabaseDateFilter {
-                equals: local.format("%Y-%m-%d").to_string(),
-            },
-        },
-    };
+    let params = NotionParamsFactory::build_query_database_params();
 
     let resp = notion_client
         .query_database(&env.database_id, &params)
@@ -36,38 +24,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
         exit(0);
     }
 
-    let local = Local::now();
-    let ja_weekday = match local.weekday() {
-        Weekday::Sun => "日",
-        Weekday::Mon => "月",
-        Weekday::Tue => "火",
-        Weekday::Wed => "水",
-        Weekday::Thu => "木",
-        Weekday::Fri => "金",
-        Weekday::Sat => "土",
-    };
-    let title = local.format("%Y/%m/%d").to_string() + "(" + ja_weekday + ")";
-    let parent = CreatePageParent {
-        database_id: env.database_id.to_string(),
-    };
-    let mut properties: HashMap<String, CreatePageProperty> = HashMap::new();
-    properties.insert(
-        "Name".to_string(),
-        CreatePageProperty::Title {
-            title: vec![CreatePageTitle {
-                text: CreatePageTitleText { content: title },
-            }],
-        },
-    );
-    properties.insert(
-        "Date".to_string(),
-        CreatePageProperty::Date {
-            date: CreatePageDate {
-                start: local.format("%Y-%m-%d").to_string(),
-            },
-        },
-    );
-    let params = CreatePageParams { parent, properties };
+    let params = NotionParamsFactory::build_create_page_params(&env.database_id);
 
     notion_client.create_page(&params).await?;
     println!("Today's diary page was created successfully.");
