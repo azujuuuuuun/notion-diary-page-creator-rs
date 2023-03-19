@@ -10,12 +10,9 @@ pub struct Env {
 pub fn load_env() -> Env {
     dotenv().ok();
 
-    let database_id =
-        env::var("NOTION_DIARY_DATABASE_ID").expect("NOTION_DIARY_DATABASE_ID must be set.");
-    let api_token = env::var("NOTION_API_TOKEN").expect("NOTION_API_TOKEN must be set.");
-
     Env {
-        database_id,
-        api_token,
+        database_id: env::var("NOTION_DIARY_DATABASE_ID")
+            .expect("NOTION_DIARY_DATABASE_ID must be set."),
+        api_token: env::var("NOTION_API_TOKEN").expect("NOTION_API_TOKEN must be set."),
     }
 }
