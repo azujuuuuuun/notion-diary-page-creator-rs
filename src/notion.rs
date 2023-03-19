@@ -3,7 +3,10 @@ use std::{collections::HashMap, error::Error};
 use reqwest::header::{HeaderMap, ACCEPT, AUTHORIZATION, CONTENT_TYPE};
 use serde::{Deserialize, Serialize};
 
-pub struct NotionApiClient {
+use crate::http_client::HttpClientTrait;
+
+pub struct NotionApiClient<C: HttpClientTrait> {
+    http_client: C,
     api_token: String,
 }
 
@@ -64,9 +67,12 @@ pub struct CreatePageParams {
     pub properties: HashMap<String, CreatePageProperty>,
 }
 
-impl NotionApiClient {
-    pub fn new(api_token: String) -> Self {
-        NotionApiClient { api_token }
+impl<C: HttpClientTrait> NotionApiClient<C> {
+    pub fn new(http_client: C, api_token: String) -> Self {
+        NotionApiClient {
+            http_client,
+            api_token,
+        }
     }
 
     pub async fn query_database(
@@ -78,14 +84,9 @@ impl NotionApiClient {
 
         let headers = self.create_headers();
 
-        let client = reqwest::Client::new();
-        let resp = client
-            .post(url)
-            .headers(headers)
-            .json(params)
-            .send()
-            .await?
-            .json::<QueryDatabaseResponse>()
+        let resp = self
+            .http_client
+            .post::<QueryDatabaseParams, QueryDatabaseResponse>(&url, headers, params)
             .await?;
 
         Ok(resp)
@@ -96,12 +97,8 @@ impl NotionApiClient {
 
         let headers = self.create_headers();
 
-        let client = reqwest::Client::new();
-        client
-            .post(url)
-            .headers(headers)
-            .json(params)
-            .send()
+        self.http_client
+            .post::<CreatePageParams, _>(url, headers, params)
             .await?;
 
         Ok(())

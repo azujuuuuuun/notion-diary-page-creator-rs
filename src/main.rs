@@ -9,6 +9,7 @@ use std::{error::Error, process::exit};
 use crate::date::Date;
 use crate::env::load_env;
 use crate::factory::NotionParamsFactory;
+use crate::http_client::{HttpClient, HttpClientTrait};
 use crate::notion::NotionApiClient;
 
 #[tokio::main]
@@ -17,7 +18,8 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     println!("Creating diary page started.");
 
-    let notion_client = NotionApiClient::new(env.api_token);
+    let http_client = HttpClient::new();
+    let notion_client = NotionApiClient::new(http_client, env.api_token);
 
     let today = Date::today();
     let params = NotionParamsFactory::build_query_database_params(&today);
