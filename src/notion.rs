@@ -116,3 +116,34 @@ impl<C: HttpClientTrait> NotionApiClient<C> {
         return headers;
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::http_client::MockHttpClientTrait;
+
+    use super::*;
+
+    #[tokio::test]
+    async fn test_query_database() {
+        let api_token = "api_token";
+        let id = "id";
+        let params = QueryDatabaseParams {
+            filter: QueryDatabaseFilter {
+                property: "Date".to_string(),
+                date: QueryDatabaseDateFilter {
+                    equals: "2023-03-19".to_string(),
+                },
+            },
+        };
+
+        let mut mock = MockHttpClientTrait::new();
+        mock.expect_post::<QueryDatabaseParams, QueryDatabaseResponse>()
+            .times(1)
+            .returning(|_, _, _| Ok(QueryDatabaseResponse { results: vec![] }));
+        let notion_api_client = NotionApiClient::new(mock, api_token.to_string());
+
+        let result = notion_api_client.query_database(id, &params).await.unwrap();
+
+        assert_eq!(result.results.len(), 0);
+    }
+}

@@ -9,7 +9,7 @@ use std::{error::Error, process::exit};
 use crate::date::Date;
 use crate::env::load_env;
 use crate::factory::NotionParamsFactory;
-use crate::http_client::{HttpClient, HttpClientTrait};
+use crate::http_client::HttpClient;
 use crate::notion::NotionApiClient;
 
 #[tokio::main]

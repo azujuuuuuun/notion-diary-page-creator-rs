@@ -1,6 +1,7 @@
 use std::error::Error;
 
 use async_trait::async_trait;
+use mockall::automock;
 use reqwest::header::HeaderMap;
 use serde::de::DeserializeOwned;
 use serde::Serialize;
@@ -9,11 +10,18 @@ pub struct HttpClient {
     client: reqwest::Client,
 }
 
+impl HttpClient {
+    pub fn new() -> Self {
+        HttpClient {
+            client: reqwest::Client::new(),
+        }
+    }
+}
+
+#[automock]
 #[async_trait]
 pub trait HttpClientTrait {
-    fn new() -> Self;
-
-    async fn post<S: Serialize + ?Sized + Sync, T: DeserializeOwned>(
+    async fn post<S: Serialize + Sync + 'static, T: DeserializeOwned + 'static>(
         &self,
         url: &str,
         headers: HeaderMap,
@@ -23,13 +31,7 @@ pub trait HttpClientTrait {
 
 #[async_trait]
 impl HttpClientTrait for HttpClient {
-    fn new() -> Self {
-        HttpClient {
-            client: reqwest::Client::new(),
-        }
-    }
-
-    async fn post<S: Serialize + ?Sized + Sync, T: DeserializeOwned>(
+    async fn post<S: Serialize + Sync + 'static, T: DeserializeOwned + 'static>(
         &self,
         url: &str,
         headers: HeaderMap,
