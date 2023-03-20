@@ -19,7 +19,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     println!("Creating diary page started.");
 
     let http_client = HttpClient::new();
-    let notion_client = NotionApiClient::new(http_client, env.api_token);
+    let notion_client = NotionApiClient::new(&http_client, env.api_token);
 
     let today = Date::today();
     let params = NotionParamsFactory::build_query_database_params(&today);

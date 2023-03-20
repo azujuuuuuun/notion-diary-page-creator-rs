@@ -5,8 +5,8 @@ use serde::{Deserialize, Serialize};
 
 use crate::http_client::HttpClientTrait;
 
-pub struct NotionApiClient<C: HttpClientTrait> {
-    http_client: C,
+pub struct NotionApiClient<'a, C: HttpClientTrait> {
+    http_client: &'a C,
     api_token: String,
 }
 
@@ -67,8 +67,8 @@ pub struct CreatePageParams {
     pub properties: HashMap<String, CreatePageProperty>,
 }
 
-impl<C: HttpClientTrait> NotionApiClient<C> {
-    pub fn new(http_client: C, api_token: String) -> Self {
+impl<'a, C: HttpClientTrait> NotionApiClient<'a, C> {
+    pub fn new(http_client: &'a C, api_token: String) -> Self {
         NotionApiClient {
             http_client,
             api_token,
@@ -147,7 +147,7 @@ mod tests {
             .with(predicate::eq(url), predicate::always(), predicate::always())
             .times(1)
             .returning(|_, _, _| Ok(QueryDatabaseResponse { results: vec![] }));
-        let notion_api_client = NotionApiClient::new(mock, api_token.to_string());
+        let notion_api_client = NotionApiClient::new(&mock, api_token.to_string());
 
         let result = notion_api_client.query_database(id, &params).await.unwrap();
 
@@ -157,7 +157,7 @@ mod tests {
     #[tokio::test]
     async fn test_create_headers() {
         let mock = MockHttpClientTrait::new();
-        let notion_api_client = NotionApiClient::new(mock, "api_token".to_string());
+        let notion_api_client = NotionApiClient::new(&mock, "api_token".to_string());
 
         let headers = notion_api_client.create_headers();
 
