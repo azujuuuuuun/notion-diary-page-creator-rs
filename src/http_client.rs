@@ -1,8 +1,8 @@
 use std::error::Error;
 
 use async_trait::async_trait;
+use http::header::HeaderMap;
 use mockall::automock;
-use reqwest::header::HeaderMap;
 use serde::de::DeserializeOwned;
 use serde::Serialize;
 

@@ -1,7 +1,7 @@
 use std::{collections::HashMap, error::Error};
 
 use async_trait::async_trait;
-use reqwest::header::{HeaderMap, ACCEPT, AUTHORIZATION, CONTENT_TYPE};
+use http::header::{HeaderMap, ACCEPT, AUTHORIZATION, CONTENT_TYPE};
 use serde::{Deserialize, Serialize};
 
 use crate::http_client::HttpClientTrait;
