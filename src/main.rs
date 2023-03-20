@@ -17,11 +17,10 @@ use crate::notion::{NotionApiClient, NotionApiClientTrait};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
-    dotenv().ok();
-
-    let env = load_env();
-
     println!("Creating diary page started.");
+
+    dotenv().ok();
+    let env = load_env();
 
     let reqwest_client = ReqwestClient::new();
     let http_client = HttpClient::new(reqwest_client);
