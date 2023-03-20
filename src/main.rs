@@ -6,6 +6,7 @@ mod notion;
 
 use std::{error::Error, process::exit};
 
+use dotenv::dotenv;
 use reqwest::Client as ReqwestClient;
 
 use crate::date::Date;
@@ -16,6 +17,8 @@ use crate::notion::{NotionApiClient, NotionApiClientTrait};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
+    dotenv().ok();
+
     let env = load_env();
 
     println!("Creating diary page started.");
