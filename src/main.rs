@@ -10,7 +10,7 @@ use dotenv::dotenv;
 use reqwest::Client as ReqwestClient;
 
 use crate::date::Date;
-use crate::env::load_env;
+use crate::env::Env;
 use crate::factory::NotionParamsFactory;
 use crate::http_client::HttpClient;
 use crate::notion::{NotionApiClient, NotionApiClientTrait};
@@ -20,7 +20,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     println!("Creating diary page started.");
 
     dotenv().ok();
-    let env = load_env();
+    let env = Env::load_env();
 
     let reqwest_client = ReqwestClient::new();
     let http_client = HttpClient::new(reqwest_client);
