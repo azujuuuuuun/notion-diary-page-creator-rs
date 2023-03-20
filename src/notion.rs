@@ -170,6 +170,31 @@ mod tests {
     }
 
     #[tokio::test]
+    async fn test_create_page() {
+        let api_token = "api_token";
+        let id = "id";
+        let params = CreatePageParams {
+            parent: CreatePageParent {
+                database_id: id.to_string(),
+            },
+            properties: HashMap::new(),
+        };
+
+        let url = "https://api.notion.com/v1/pages";
+
+        let mut mock = MockHttpClientTrait::new();
+        mock.expect_post::<CreatePageParams, _>()
+            .with(predicate::eq(url), predicate::always(), predicate::always())
+            .times(1)
+            .returning(|_, _, _| Ok(()));
+        let notion_api_client = NotionApiClient::new(&mock, api_token.to_string());
+
+        let result = notion_api_client.create_page(params).await.unwrap();
+
+        assert_eq!(result, ());
+    }
+
+    #[tokio::test]
     async fn test_create_headers() {
         let mock = MockHttpClientTrait::new();
         let notion_api_client = NotionApiClient::new(&mock, "api_token".to_string());
