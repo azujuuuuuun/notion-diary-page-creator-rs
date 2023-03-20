@@ -106,6 +106,7 @@ impl<C: HttpClientTrait> NotionApiClient<C> {
 
     fn create_headers(&self) -> HeaderMap {
         let mut headers = HeaderMap::new();
+
         headers.insert(ACCEPT, "application/json".parse().unwrap());
         headers.insert("Notion-Version", "2022-06-28".parse().unwrap());
         headers.insert(CONTENT_TYPE, "application/json".parse().unwrap());
@@ -113,7 +114,8 @@ impl<C: HttpClientTrait> NotionApiClient<C> {
             AUTHORIZATION,
             ("Bearer ".to_owned() + &self.api_token).parse().unwrap(),
         );
-        return headers;
+
+        headers
     }
 }
 
