@@ -1,14 +1,10 @@
 use std::{collections::HashMap, error::Error};
 
+use async_trait::async_trait;
 use reqwest::header::{HeaderMap, ACCEPT, AUTHORIZATION, CONTENT_TYPE};
 use serde::{Deserialize, Serialize};
 
 use crate::http_client::HttpClientTrait;
-
-pub struct NotionApiClient<'a, C: HttpClientTrait> {
-    http_client: &'a C,
-    api_token: String,
-}
 
 #[derive(Serialize)]
 pub struct QueryDatabaseDateFilter {
@@ -67,6 +63,22 @@ pub struct CreatePageParams {
     pub properties: HashMap<String, CreatePageProperty>,
 }
 
+pub struct NotionApiClient<'a, C: HttpClientTrait> {
+    http_client: &'a C,
+    api_token: String,
+}
+
+#[async_trait]
+pub trait NotionApiClientTrait {
+    async fn query_database(
+        &self,
+        id: &str,
+        params: &QueryDatabaseParams,
+    ) -> Result<QueryDatabaseResponse, Box<dyn Error>>;
+
+    async fn create_page(&self, params: &CreatePageParams) -> Result<(), Box<dyn Error>>;
+}
+
 impl<'a, C: HttpClientTrait> NotionApiClient<'a, C> {
     pub fn new(http_client: &'a C, api_token: String) -> Self {
         NotionApiClient {
@@ -75,7 +87,24 @@ impl<'a, C: HttpClientTrait> NotionApiClient<'a, C> {
         }
     }
 
-    pub async fn query_database(
+    fn create_headers(&self) -> HeaderMap {
+        let mut headers = HeaderMap::new();
+
+        headers.insert(ACCEPT, "application/json".parse().unwrap());
+        headers.insert("Notion-Version", "2022-06-28".parse().unwrap());
+        headers.insert(CONTENT_TYPE, "application/json".parse().unwrap());
+        headers.insert(
+            AUTHORIZATION,
+            ("Bearer ".to_owned() + &self.api_token).parse().unwrap(),
+        );
+
+        headers
+    }
+}
+
+#[async_trait]
+impl<'a, C: HttpClientTrait + Sync> NotionApiClientTrait for NotionApiClient<'a, C> {
+    async fn query_database(
         &self,
         id: &str,
         params: &QueryDatabaseParams,
@@ -92,7 +121,7 @@ impl<'a, C: HttpClientTrait> NotionApiClient<'a, C> {
         Ok(resp)
     }
 
-    pub async fn create_page(&self, params: &CreatePageParams) -> Result<(), Box<dyn Error>> {
+    async fn create_page(&self, params: &CreatePageParams) -> Result<(), Box<dyn Error>> {
         let url = "https://api.notion.com/v1/pages";
 
         let headers = self.create_headers();
@@ -102,20 +131,6 @@ impl<'a, C: HttpClientTrait> NotionApiClient<'a, C> {
             .await?;
 
         Ok(())
-    }
-
-    fn create_headers(&self) -> HeaderMap {
-        let mut headers = HeaderMap::new();
-
-        headers.insert(ACCEPT, "application/json".parse().unwrap());
-        headers.insert("Notion-Version", "2022-06-28".parse().unwrap());
-        headers.insert(CONTENT_TYPE, "application/json".parse().unwrap());
-        headers.insert(
-            AUTHORIZATION,
-            ("Bearer ".to_owned() + &self.api_token).parse().unwrap(),
-        );
-
-        headers
     }
 }
 

@@ -10,7 +10,7 @@ use crate::date::Date;
 use crate::env::load_env;
 use crate::factory::NotionParamsFactory;
 use crate::http_client::HttpClient;
-use crate::notion::NotionApiClient;
+use crate::notion::{NotionApiClient, NotionApiClientTrait};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
