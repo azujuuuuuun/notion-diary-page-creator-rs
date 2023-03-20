@@ -6,6 +6,8 @@ mod notion;
 
 use std::{error::Error, process::exit};
 
+use reqwest::Client as ReqwestClient;
+
 use crate::date::Date;
 use crate::env::load_env;
 use crate::factory::NotionParamsFactory;
@@ -18,7 +20,8 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     println!("Creating diary page started.");
 
-    let http_client = HttpClient::new();
+    let reqwest_client = ReqwestClient::new();
+    let http_client = HttpClient::new(reqwest_client);
     let notion_client = NotionApiClient::new(&http_client, env.api_token);
 
     let today = Date::today();

@@ -11,10 +11,8 @@ pub struct HttpClient {
 }
 
 impl HttpClient {
-    pub fn new() -> Self {
-        HttpClient {
-            client: reqwest::Client::new(),
-        }
+    pub fn new(client: reqwest::Client) -> Self {
+        HttpClient { client }
     }
 }
 
