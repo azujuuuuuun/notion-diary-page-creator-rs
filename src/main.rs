@@ -30,7 +30,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     let params = NotionParamsFactory::build_query_database_params(&today);
     let resp = notion_client
-        .query_database(&env.database_id, &params)
+        .query_database(&env.database_id, params)
         .await?;
     if !resp.results.is_empty() {
         println!("Today's diary page was already created.");
@@ -38,7 +38,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     }
 
     let params = NotionParamsFactory::build_create_page_params(&env.database_id, &today);
-    notion_client.create_page(&params).await?;
+    notion_client.create_page(params).await?;
 
     println!("Today's diary page was created successfully.");
 

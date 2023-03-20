@@ -73,10 +73,10 @@ pub trait NotionApiClientTrait {
     async fn query_database(
         &self,
         id: &str,
-        params: &QueryDatabaseParams,
+        params: QueryDatabaseParams,
     ) -> Result<QueryDatabaseResponse, Box<dyn Error>>;
 
-    async fn create_page(&self, params: &CreatePageParams) -> Result<(), Box<dyn Error>>;
+    async fn create_page(&self, params: CreatePageParams) -> Result<(), Box<dyn Error>>;
 }
 
 impl<'a, C: HttpClientTrait> NotionApiClient<'a, C> {
@@ -107,7 +107,7 @@ impl<'a, C: HttpClientTrait + Sync> NotionApiClientTrait for NotionApiClient<'a,
     async fn query_database(
         &self,
         id: &str,
-        params: &QueryDatabaseParams,
+        params: QueryDatabaseParams,
     ) -> Result<QueryDatabaseResponse, Box<dyn Error>> {
         let url = format!("https://api.notion.com/v1/databases/{}/query", id);
 
@@ -115,19 +115,19 @@ impl<'a, C: HttpClientTrait + Sync> NotionApiClientTrait for NotionApiClient<'a,
 
         let resp = self
             .http_client
-            .post::<QueryDatabaseParams, QueryDatabaseResponse>(&url, headers, params)
+            .post::<QueryDatabaseParams, QueryDatabaseResponse>(&url, headers, &params)
             .await?;
 
         Ok(resp)
     }
 
-    async fn create_page(&self, params: &CreatePageParams) -> Result<(), Box<dyn Error>> {
+    async fn create_page(&self, params: CreatePageParams) -> Result<(), Box<dyn Error>> {
         let url = "https://api.notion.com/v1/pages";
 
         let headers = self.create_headers();
 
         self.http_client
-            .post::<CreatePageParams, _>(url, headers, params)
+            .post::<CreatePageParams, _>(url, headers, &params)
             .await?;
 
         Ok(())
@@ -164,7 +164,7 @@ mod tests {
             .returning(|_, _, _| Ok(QueryDatabaseResponse { results: vec![] }));
         let notion_api_client = NotionApiClient::new(&mock, api_token.to_string());
 
-        let result = notion_api_client.query_database(id, &params).await.unwrap();
+        let result = notion_api_client.query_database(id, params).await.unwrap();
 
         assert_eq!(result.results.len(), 0);
     }
