@@ -27,7 +27,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let resp = notion_client
         .query_database(&env.database_id, &params)
         .await?;
-    if resp.results.len() > 0 {
+    if !resp.results.is_empty() {
         println!("Today's diary page was already created.");
         exit(0);
     }
