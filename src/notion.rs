@@ -95,7 +95,7 @@ impl<'a, C: HttpClientTrait> NotionApiClient<'a, C> {
         headers.insert(CONTENT_TYPE, "application/json".parse().unwrap());
         headers.insert(
             AUTHORIZATION,
-            ("Bearer ".to_owned() + &self.api_token).parse().unwrap(),
+            format!("Bearer {}", self.api_token).parse().unwrap(),
         );
 
         headers
@@ -109,7 +109,7 @@ impl<'a, C: HttpClientTrait + Sync> NotionApiClientTrait for NotionApiClient<'a,
         id: &str,
         params: &QueryDatabaseParams,
     ) -> Result<QueryDatabaseResponse, Box<dyn Error>> {
-        let url = "https://api.notion.com/v1/databases/".to_owned() + id + "/query";
+        let url = format!("https://api.notion.com/v1/databases/{}/query", id);
 
         let headers = self.create_headers();
 

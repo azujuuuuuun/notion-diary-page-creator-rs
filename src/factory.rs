@@ -21,7 +21,7 @@ impl NotionParamsFactory {
     }
 
     pub fn build_create_page_params(database_id: &str, today: &Date) -> CreatePageParams {
-        let title = today.format_with_slash() + "(" + &today.ja_weekday() + ")";
+        let title = format!("{}({})", today.format_with_slash(), today.ja_weekday());
         let parent = CreatePageParent {
             database_id: database_id.to_string(),
         };
