@@ -63,6 +63,9 @@ pub struct CreatePageParams {
     pub properties: HashMap<String, CreatePageProperty>,
 }
 
+#[derive(Deserialize, Debug)]
+pub struct CreatePageResponse {}
+
 pub struct NotionApiClient<'a, C: HttpClientTrait> {
     http_client: &'a C,
     api_token: String,
@@ -127,7 +130,7 @@ impl<'a, C: HttpClientTrait + Sync> NotionApiClientTrait for NotionApiClient<'a,
         let headers = self.create_headers();
 
         self.http_client
-            .post::<CreatePageParams, _>(url, headers, &params)
+            .post::<CreatePageParams, CreatePageResponse>(url, headers, &params)
             .await?;
 
         Ok(())
@@ -186,7 +189,7 @@ mod tests {
         mock.expect_post::<CreatePageParams, _>()
             .with(predicate::eq(url), predicate::always(), predicate::always())
             .times(1)
-            .returning(|_, _, _| Ok(()));
+            .returning(|_, _, _| Ok(CreatePageResponse {}));
         let notion_api_client = NotionApiClient::new(&mock, api_token.to_string());
 
         let result = notion_api_client.create_page(params).await.unwrap();
