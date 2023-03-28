@@ -8,7 +8,7 @@ use crate::notion::NotionApiClientTrait;
 
 #[async_trait]
 pub trait ServiceTrait {
-    async fn create_diary_page(&self, id: &str) -> Result<(), Box<dyn Error>>;
+    async fn create_diary_page(&self, id: &str, date: &Date) -> Result<(), Box<dyn Error>>;
 }
 
 pub struct Service<C: NotionApiClientTrait> {
@@ -23,19 +23,17 @@ impl<C: NotionApiClientTrait> Service<C> {
 
 #[async_trait]
 impl<C: NotionApiClientTrait + Sync + Send> ServiceTrait for Service<C> {
-    async fn create_diary_page(&self, id: &str) -> Result<(), Box<dyn Error>> {
+    async fn create_diary_page(&self, id: &str, date: &Date) -> Result<(), Box<dyn Error>> {
         println!("Creating diary page started.");
 
-        let today = Date::today();
-
-        let params = NotionParamsFactory::build_query_database_params(&today);
+        let params = NotionParamsFactory::build_query_database_params(date);
         let resp = self.notion_client.query_database(id, params).await?;
         if !resp.results.is_empty() {
             println!("Today's diary page was already created.");
             return Ok(());
         }
 
-        let params = NotionParamsFactory::build_create_page_params(id, &today);
+        let params = NotionParamsFactory::build_create_page_params(id, date);
         self.notion_client.create_page(params).await?;
 
         println!("Today's diary page was created successfully.");

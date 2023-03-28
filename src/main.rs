@@ -7,6 +7,7 @@ mod service;
 
 use std::error::Error;
 
+use date::Date;
 use dotenv::dotenv;
 use reqwest::Client as ReqwestClient;
 
@@ -25,7 +26,9 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let notion_client = NotionApiClient::new(&http_client, env.api_token);
     let service = Service::new(notion_client);
 
-    service.create_diary_page(&env.database_id).await?;
+    let today = Date::today();
+
+    service.create_diary_page(&env.database_id, &today).await?;
 
     Ok(())
 }
