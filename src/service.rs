@@ -44,15 +44,21 @@ impl<C: NotionApiClientTrait + Sync + Send> ServiceTrait for Service<C> {
 
 #[cfg(test)]
 mod tests {
+    use mockall::*;
+
     use crate::notion::{MockNotionApiClientTrait, QueryDatabaseResponse, QueryDatabaseResult};
 
     use super::*;
 
     #[tokio::test]
     async fn test_create_diary_page_when_page_exists() {
+        let id = "id";
+        let date = Date::new(2023, 03, 29, 0, 0, 0);
+
         let mut notion_client = MockNotionApiClientTrait::new();
         notion_client
             .expect_query_database()
+            .with(predicate::eq(id), predicate::always())
             .times(1)
             .returning(|_, _| {
                 Ok(QueryDatabaseResponse {
@@ -63,10 +69,7 @@ mod tests {
             .expect_create_page()
             .times(0)
             .returning(|_| Ok(()));
-
         let service = Service::new(notion_client);
-        let id = "id";
-        let date = Date::new(2023, 03, 29, 0, 0, 0);
 
         let result = service.create_diary_page(id, &date).await.unwrap();
 
@@ -75,19 +78,21 @@ mod tests {
 
     #[tokio::test]
     async fn test_create_diary_page_when_no_page_exists() {
+        let id = "id";
+        let date = Date::new(2023, 03, 29, 0, 0, 0);
+
         let mut notion_client = MockNotionApiClientTrait::new();
         notion_client
             .expect_query_database()
+            .with(predicate::eq(id), predicate::always())
             .times(1)
             .returning(|_, _| Ok(QueryDatabaseResponse { results: vec![] }));
         notion_client
             .expect_create_page()
+            .with(predicate::always())
             .times(1)
             .returning(|_| Ok(()));
-
         let service = Service::new(notion_client);
-        let id = "id";
-        let date = Date::new(2023, 03, 29, 0, 0, 0);
 
         let result = service.create_diary_page(id, &date).await.unwrap();
 
