@@ -2,6 +2,7 @@ use std::{collections::HashMap, error::Error};
 
 use async_trait::async_trait;
 use http::header::{HeaderMap, ACCEPT, AUTHORIZATION, CONTENT_TYPE};
+use mockall::automock;
 use serde::{Deserialize, Serialize};
 
 use crate::http_client::HttpClientTrait;
@@ -71,6 +72,7 @@ pub struct NotionApiClient<'a, C: HttpClientTrait> {
     api_token: String,
 }
 
+#[automock]
 #[async_trait]
 pub trait NotionApiClientTrait {
     async fn query_database(
