@@ -77,7 +77,7 @@ pub struct NotionApiClient<'a, C: HttpClientTrait> {
 pub trait NotionApiClientTrait {
     async fn query_database(
         &self,
-        id: &str,
+        database_id: &str,
         params: QueryDatabaseParams,
     ) -> Result<QueryDatabaseResponse, Box<dyn Error>>;
 
@@ -111,10 +111,10 @@ impl<'a, C: HttpClientTrait> NotionApiClient<'a, C> {
 impl<'a, C: HttpClientTrait + Sync> NotionApiClientTrait for NotionApiClient<'a, C> {
     async fn query_database(
         &self,
-        id: &str,
+        database_id: &str,
         params: QueryDatabaseParams,
     ) -> Result<QueryDatabaseResponse, Box<dyn Error>> {
-        let url = format!("https://api.notion.com/v1/databases/{}/query", id);
+        let url = format!("https://api.notion.com/v1/databases/{}/query", database_id);
 
         let headers = self.create_headers();
 
@@ -150,7 +150,7 @@ mod tests {
     #[tokio::test]
     async fn test_query_database() {
         let api_token = "api_token";
-        let id = "id";
+        let database_id = "database_id";
         let params = QueryDatabaseParams {
             filter: QueryDatabaseFilter {
                 property: "Date".to_string(),
@@ -160,7 +160,7 @@ mod tests {
             },
         };
 
-        let url = "https://api.notion.com/v1/databases/id/query";
+        let url = "https://api.notion.com/v1/databases/database_id/query";
 
         let mut mock = MockHttpClientTrait::new();
         mock.expect_post::<QueryDatabaseParams, QueryDatabaseResponse>()
@@ -169,7 +169,10 @@ mod tests {
             .returning(|_, _, _| Ok(QueryDatabaseResponse { results: vec![] }));
         let notion_api_client = NotionApiClient::new(&mock, api_token.to_string());
 
-        let result = notion_api_client.query_database(id, params).await.unwrap();
+        let result = notion_api_client
+            .query_database(database_id, params)
+            .await
+            .unwrap();
 
         assert_eq!(result.results.len(), 0);
     }
@@ -177,10 +180,10 @@ mod tests {
     #[tokio::test]
     async fn test_create_page() {
         let api_token = "api_token";
-        let id = "id";
+        let database_id = "database_id";
         let params = CreatePageParams {
             parent: CreatePageParent {
-                database_id: id.to_string(),
+                database_id: database_id.to_string(),
             },
             properties: HashMap::new(),
         };
