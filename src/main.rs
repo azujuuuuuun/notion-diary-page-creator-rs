@@ -1,9 +1,9 @@
 mod date;
+mod diary_service;
 mod env;
 mod factory;
 mod http_client;
 mod notion;
-mod service;
 
 use std::error::Error;
 
@@ -11,10 +11,10 @@ use date::Date;
 use dotenv::dotenv;
 use reqwest::Client as ReqwestClient;
 
+use crate::diary_service::{Service, ServiceTrait};
 use crate::env::Env;
 use crate::http_client::HttpClient;
 use crate::notion::NotionApiClient;
-use crate::service::{Service, ServiceTrait};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
