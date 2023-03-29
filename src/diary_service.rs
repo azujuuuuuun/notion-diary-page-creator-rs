@@ -12,12 +12,12 @@ pub trait DiaryServiceTrait {
 }
 
 pub struct DiaryService<C: NotionApiClientTrait> {
-    notion_client: C,
+    notion_api_client: C,
 }
 
 impl<C: NotionApiClientTrait> DiaryService<C> {
-    pub fn new(notion_client: C) -> Self {
-        DiaryService { notion_client }
+    pub fn new(notion_api_client: C) -> Self {
+        DiaryService { notion_api_client }
     }
 }
 
@@ -27,14 +27,14 @@ impl<C: NotionApiClientTrait + Sync + Send> DiaryServiceTrait for DiaryService<C
         println!("Creating diary page started.");
 
         let params = NotionParamsFactory::build_query_database_params(date);
-        let resp = self.notion_client.query_database(id, params).await?;
+        let resp = self.notion_api_client.query_database(id, params).await?;
         if !resp.results.is_empty() {
             println!("Today's diary page was already created.");
             return Ok(());
         }
 
         let params = NotionParamsFactory::build_create_page_params(id, date);
-        self.notion_client.create_page(params).await?;
+        self.notion_api_client.create_page(params).await?;
 
         println!("Today's diary page was created successfully.");
 
@@ -55,8 +55,8 @@ mod tests {
         let id = "id";
         let date = Date::new(2023, 03, 29, 0, 0, 0);
 
-        let mut notion_client = MockNotionApiClientTrait::new();
-        notion_client
+        let mut notion_api_client = MockNotionApiClientTrait::new();
+        notion_api_client
             .expect_query_database()
             .with(predicate::eq(id), predicate::always())
             .times(1)
@@ -65,11 +65,11 @@ mod tests {
                     results: vec![QueryDatabaseResult {}],
                 })
             });
-        notion_client
+        notion_api_client
             .expect_create_page()
             .times(0)
             .returning(|_| Ok(()));
-        let diary_service = DiaryService::new(notion_client);
+        let diary_service = DiaryService::new(notion_api_client);
 
         let result = diary_service.create_diary_page(id, &date).await.unwrap();
 
@@ -81,18 +81,18 @@ mod tests {
         let id = "id";
         let date = Date::new(2023, 03, 29, 0, 0, 0);
 
-        let mut notion_client = MockNotionApiClientTrait::new();
-        notion_client
+        let mut notion_api_client = MockNotionApiClientTrait::new();
+        notion_api_client
             .expect_query_database()
             .with(predicate::eq(id), predicate::always())
             .times(1)
             .returning(|_, _| Ok(QueryDatabaseResponse { results: vec![] }));
-        notion_client
+        notion_api_client
             .expect_create_page()
             .with(predicate::always())
             .times(1)
             .returning(|_| Ok(()));
-        let diary_service = DiaryService::new(notion_client);
+        let diary_service = DiaryService::new(notion_api_client);
 
         let result = diary_service.create_diary_page(id, &date).await.unwrap();
 
