@@ -7,22 +7,22 @@ use crate::factory::NotionParamsFactory;
 use crate::notion::NotionApiClientTrait;
 
 #[async_trait]
-pub trait ServiceTrait {
+pub trait DiaryServiceTrait {
     async fn create_diary_page(&self, id: &str, date: &Date) -> Result<(), Box<dyn Error>>;
 }
 
-pub struct Service<C: NotionApiClientTrait> {
+pub struct DiaryService<C: NotionApiClientTrait> {
     notion_client: C,
 }
 
-impl<C: NotionApiClientTrait> Service<C> {
+impl<C: NotionApiClientTrait> DiaryService<C> {
     pub fn new(notion_client: C) -> Self {
-        Service { notion_client }
+        DiaryService { notion_client }
     }
 }
 
 #[async_trait]
-impl<C: NotionApiClientTrait + Sync + Send> ServiceTrait for Service<C> {
+impl<C: NotionApiClientTrait + Sync + Send> DiaryServiceTrait for DiaryService<C> {
     async fn create_diary_page(&self, id: &str, date: &Date) -> Result<(), Box<dyn Error>> {
         println!("Creating diary page started.");
 
@@ -69,9 +69,9 @@ mod tests {
             .expect_create_page()
             .times(0)
             .returning(|_| Ok(()));
-        let service = Service::new(notion_client);
+        let diary_service = DiaryService::new(notion_client);
 
-        let result = service.create_diary_page(id, &date).await.unwrap();
+        let result = diary_service.create_diary_page(id, &date).await.unwrap();
 
         assert_eq!(result, ());
     }
@@ -92,9 +92,9 @@ mod tests {
             .with(predicate::always())
             .times(1)
             .returning(|_| Ok(()));
-        let service = Service::new(notion_client);
+        let diary_service = DiaryService::new(notion_client);
 
-        let result = service.create_diary_page(id, &date).await.unwrap();
+        let result = diary_service.create_diary_page(id, &date).await.unwrap();
 
         assert_eq!(result, ());
     }
