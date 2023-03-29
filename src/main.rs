@@ -1,5 +1,4 @@
 mod date;
-mod diary_repository;
 mod diary_service;
 mod env;
 mod factory;
