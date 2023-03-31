@@ -107,7 +107,7 @@ mod tests {
 
         let exist = diary_repository.exist(database_id, &date).await.unwrap();
 
-        assert_eq!(exist, false);
+        assert!(!exist);
     }
 
     #[tokio::test]
@@ -129,7 +129,7 @@ mod tests {
 
         let exist = diary_repository.exist(database_id, &date).await.unwrap();
 
-        assert_eq!(exist, true);
+        assert!(exist);
     }
 
     #[tokio::test]
