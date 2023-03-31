@@ -49,25 +49,25 @@ mod tests {
 
     #[test]
     fn test_format() {
-        assert_eq!(Date::new(2023, 03, 19, 0, 0, 0).format(), "2023-03-19")
+        assert_eq!(Date::new(2023, 3, 19, 0, 0, 0).format(), "2023-03-19")
     }
 
     #[test]
     fn test_format_with_slash() {
         assert_eq!(
-            Date::new(2023, 03, 19, 0, 0, 0).format_with_slash(),
+            Date::new(2023, 3, 19, 0, 0, 0).format_with_slash(),
             "2023/03/19"
         )
     }
 
     #[test]
     fn test_ja_weekday() {
-        assert_eq!(Date::new(2023, 03, 19, 0, 0, 0).ja_weekday(), "日");
-        assert_eq!(Date::new(2023, 03, 20, 0, 0, 0).ja_weekday(), "月");
-        assert_eq!(Date::new(2023, 03, 21, 0, 0, 0).ja_weekday(), "火");
-        assert_eq!(Date::new(2023, 03, 22, 0, 0, 0).ja_weekday(), "水");
-        assert_eq!(Date::new(2023, 03, 23, 0, 0, 0).ja_weekday(), "木");
-        assert_eq!(Date::new(2023, 03, 24, 0, 0, 0).ja_weekday(), "金");
-        assert_eq!(Date::new(2023, 03, 25, 0, 0, 0).ja_weekday(), "土");
+        assert_eq!(Date::new(2023, 3, 19, 0, 0, 0).ja_weekday(), "日");
+        assert_eq!(Date::new(2023, 3, 20, 0, 0, 0).ja_weekday(), "月");
+        assert_eq!(Date::new(2023, 3, 21, 0, 0, 0).ja_weekday(), "火");
+        assert_eq!(Date::new(2023, 3, 22, 0, 0, 0).ja_weekday(), "水");
+        assert_eq!(Date::new(2023, 3, 23, 0, 0, 0).ja_weekday(), "木");
+        assert_eq!(Date::new(2023, 3, 24, 0, 0, 0).ja_weekday(), "金");
+        assert_eq!(Date::new(2023, 3, 25, 0, 0, 0).ja_weekday(), "土");
     }
 }

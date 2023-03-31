@@ -50,7 +50,7 @@ mod tests {
     #[tokio::test]
     async fn test_create_diary_page_when_page_exists() {
         let id = "id";
-        let date = Date::new(2023, 03, 29, 0, 0, 0);
+        let date = Date::new(2023, 3, 29, 0, 0, 0);
 
         let mut diary_repository = MockDiaryRepositoryTrait::new();
         diary_repository
@@ -69,7 +69,7 @@ mod tests {
     #[tokio::test]
     async fn test_create_diary_page_when_no_page_exists() {
         let id = "id";
-        let date = Date::new(2023, 03, 29, 0, 0, 0);
+        let date = Date::new(2023, 3, 29, 0, 0, 0);
 
         let mut diary_repository = MockDiaryRepositoryTrait::new();
         diary_repository

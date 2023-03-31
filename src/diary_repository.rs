@@ -95,7 +95,7 @@ mod tests {
     #[tokio::test]
     async fn test_exist_false() {
         let database_id = "database_id";
-        let date = Date::new(2023, 03, 29, 0, 0, 0);
+        let date = Date::new(2023, 3, 29, 0, 0, 0);
 
         let mut notion_api_client = MockNotionApiClientTrait::new();
         notion_api_client
@@ -113,7 +113,7 @@ mod tests {
     #[tokio::test]
     async fn test_exist_true() {
         let database_id = "database_id";
-        let date = Date::new(2023, 03, 29, 0, 0, 0);
+        let date = Date::new(2023, 3, 29, 0, 0, 0);
 
         let mut notion_api_client = MockNotionApiClientTrait::new();
         notion_api_client
@@ -135,7 +135,7 @@ mod tests {
     #[tokio::test]
     async fn test_create_page() {
         let database_id = "database_id";
-        let date = Date::new(2023, 03, 29, 0, 0, 0);
+        let date = Date::new(2023, 3, 29, 0, 0, 0);
 
         let mut notion_api_client = MockNotionApiClientTrait::new();
         notion_api_client
