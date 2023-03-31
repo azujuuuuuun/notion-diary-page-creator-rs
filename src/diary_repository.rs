@@ -145,11 +145,9 @@ mod tests {
             .returning(|_| Ok(()));
         let diary_repository = DiaryRepository::new(notion_api_client);
 
-        let result = diary_repository
+        diary_repository
             .create_page(database_id, &date)
             .await
             .unwrap();
-
-        assert_eq!(result, ());
     }
 }

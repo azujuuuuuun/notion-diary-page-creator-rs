@@ -197,9 +197,7 @@ mod tests {
             .returning(|_, _, _| Ok(CreatePageResponse {}));
         let notion_api_client = NotionApiClient::new(&mock, api_token.to_string());
 
-        let result = notion_api_client.create_page(params).await.unwrap();
-
-        assert_eq!(result, ());
+        notion_api_client.create_page(params).await.unwrap();
     }
 
     #[tokio::test]

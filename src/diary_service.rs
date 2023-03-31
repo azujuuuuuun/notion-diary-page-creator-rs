@@ -61,9 +61,7 @@ mod tests {
         diary_repository.expect_create_page().times(0);
         let diary_service = DiaryService::new(diary_repository);
 
-        let result = diary_service.create_diary_page(id, &date).await.unwrap();
-
-        assert_eq!(result, ());
+        diary_service.create_diary_page(id, &date).await.unwrap();
     }
 
     #[tokio::test]
@@ -84,8 +82,6 @@ mod tests {
             .returning(|_, _| Ok(()));
         let diary_service = DiaryService::new(diary_repository);
 
-        let result = diary_service.create_diary_page(id, &date).await.unwrap();
-
-        assert_eq!(result, ());
+        diary_service.create_diary_page(id, &date).await.unwrap();
     }
 }
