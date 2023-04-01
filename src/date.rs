@@ -1,5 +1,6 @@
 use chrono::{DateTime, Datelike, Local, Weekday};
 
+#[derive(Debug, PartialEq, Clone, Copy)]
 pub struct Date {
     date_time: DateTime<Local>,
 }

@@ -55,7 +55,7 @@ mod tests {
         let mut diary_repository = MockDiaryRepositoryTrait::new();
         diary_repository
             .expect_exist()
-            .with(predicate::eq(id), predicate::always())
+            .with(predicate::eq(id), predicate::function(move |d| d == &date))
             .times(1)
             .returning(|_, _| Ok(true));
         diary_repository.expect_create_page().times(0);
@@ -72,12 +72,12 @@ mod tests {
         let mut diary_repository = MockDiaryRepositoryTrait::new();
         diary_repository
             .expect_exist()
-            .with(predicate::eq(id), predicate::always())
+            .with(predicate::eq(id), predicate::function(move |d| d == &date))
             .times(1)
             .returning(|_, _| Ok(false));
         diary_repository
             .expect_create_page()
-            .with(predicate::eq(id), predicate::always())
+            .with(predicate::eq(id), predicate::function(move |d| d == &date))
             .times(1)
             .returning(|_, _| Ok(()));
         let diary_service = DiaryService::new(diary_repository);
